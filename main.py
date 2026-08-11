@@ -2,6 +2,8 @@ from dotenv import load_dotenv
 from os import getenv
 import requests
 
+from lerpagina import dadosBoletim
+
 load_dotenv()
 
 def fazer_login():
@@ -15,7 +17,7 @@ def fazer_login():
     csrftoken = session.cookies.get("__Host-csrftoken")
 
     if not csrftoken:
-        print("Não consegui obter o csrftoken.")
+        print("Não consegui obter o csrftoken.") 
         return None
 
     payload = {
@@ -39,11 +41,13 @@ def acessarBoletim(url, session) -> str | None:
 
 def main():
     session = fazer_login()
+    if not session:
+        return # Encerrando a função aqui caso a sessão não seja iniciada.
 
     periodos = ["2024_1", "2025_1", "2026_1"]
     for periodo in periodos:
         url_boletim = f"https://suap.ifmt.edu.br/edu/aluno/{getenv("MATRICULA")}/?tab=boletim&ano_periodo={periodo}"
-        paginaBoletim = session.get(url_boletim).content.decode()
+        paginaBoletim = session.get(url_boletim).content.decode() # Código HTML da página.w
 
         if not paginaBoletim:   
             return
@@ -52,4 +56,7 @@ def main():
             arquivo.write(paginaBoletim)
         arquivo.close()
 
-main()
+    dadosBoletim("paginaboletin-2024_1.html")
+
+if __name__ == "__main__":
+    main()
