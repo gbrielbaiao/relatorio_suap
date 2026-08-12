@@ -1,15 +1,15 @@
 from selectolax.parser import HTMLParser
 
-from functions.arquivo import *
+from functions.arquivo import lerArquivo
 
-def pegarTexto(no): # Essa função está sendo usada para coletar o texto dos elementos HTML.
+def pegarTexto(no) -> str | None: # Essa função está sendo usada para coletar o texto dos elementos HTML.
     return str(no.text(strip=True)) if no else None
 
-def coletarDadosBoletim(arquivo_nome: str) -> dict:
-    pagina = lerArquivo(arquivo_nome)
-    if pagina["status"] != 200:
-        return None
-    tree = HTMLParser(pagina["conteudo"])
+def coletarDadosBoletim(arquivoNome: str) -> dict | None:
+    pagina = lerArquivo(arquivoNome)
+    if not pagina:
+        return
+    tree = HTMLParser(pagina)
 
     campoNotas = tree.css_first("tbody")
     materias = campoNotas.css("tr")
@@ -29,13 +29,14 @@ def coletarDadosBoletim(arquivo_nome: str) -> dict:
 
             bimestres[i] = {
                 "nota_prova": nota_prova,
-                "nota_atitudina": nota_atitudinal,
+                "nota_atitudinal": nota_atitudinal,
                 "nota_bimestre": nota_bimestre
             }
+            
         nota_final = pegarTexto(materia.css_first('td[headers="th_mfd"]'))
 
         objMaterias[idx] = {
-            "disciplina": disciplina.split('-')[1].strip(),
+            "disciplina": disciplina.split('-')[1].strip() if not disciplina else None,
             "frequencia": frequencia,
             "situacao": situacao,
             "bimestres": bimestres,
@@ -45,4 +46,4 @@ def coletarDadosBoletim(arquivo_nome: str) -> dict:
 
 # coletarDadosBoletim("paginaboletin-2024_1.html") 
 # A linha de código acima esta sendo usada apenas para testes.
-# Quando a funcionalidade estivar pronta ela sera removida
+# Quando a funcionalidade estivar pronta ela sera removida.

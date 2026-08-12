@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from os import getenv
+from os import getenv, remove as removerArquivo
 import requests
 
 from functions.boletim import coletarDadosBoletim
@@ -22,7 +22,7 @@ def fazer_login():
 
     if not csrftoken:
         print("Não consegui obter o csrftoken.") 
-        return None
+        return 
 
     payload = {
         "username": MATRICULA,
@@ -32,7 +32,11 @@ def fazer_login():
     headers = {
         "Referer": url_login,
     }
-    session.post(url_login, data=payload, headers=headers)
+    res = session.post(url_login, data=payload, headers=headers)
+
+    if not res.url == "https://suap.ifmt.edu.br/":
+        print("Erro ao fazer login.")
+        return  
 
     print("Login realizado com sucesso!")
     return session
@@ -42,8 +46,8 @@ def acessarPaginaBoletim(url, session) -> str | None:
     # conteudo no formato de String, ao invés de Bytes.
 
     res = session.get(url)
-    if not res: return None
-    if res.status_code != 200: return None
+    if not res: return 
+    if res.status_code != 200: return 
     return res.content.decode()
 
 def main():
@@ -53,20 +57,25 @@ def main():
 
     # Acessando as páginas para coletar os dados de cada periodo.
     periodos = ["2024_1", "2025_1", "2026_1"]
-    boletimCompleto = {}
-    for idx, periodo in enumerate(periodos):
+    boletimCompleto = []
+    for periodo in periodos:
+        arquivoNome = f"paginaboletin-{periodo}.html"
+
         url_boletim = f"https://suap.ifmt.edu.br/edu/aluno/{getenv("MATRICULA")}/?tab=boletim&ano_periodo={periodo}"
-        paginaBoletim = session.get(url_boletim).content.decode() # Código HTML da página.
+        paginaBoletim = acessarPaginaBoletim(url_boletim, session) # Código HTML da página.
 
         if not paginaBoletim:   
+            print("A página do boletim pode não ter sido carregada.")
             return # Encerrando o código aqui, caso a página não seja carregada com sucesso.
 
-        salvarArquivo(f"paginaboletin-{periodo}.html", paginaBoletim)
+        salvarArquivo(arquivoNome, paginaBoletim)
 
         # Coletando os dados de cada periodo.
-        boletimPeriodo = coletarDadosBoletim(f"paginaboletin-{periodo}.html")
-        boletimCompleto[idx] = boletimPeriodo
-        
+        boletimPeriodo = coletarDadosBoletim(arquivoNome)
+        boletimCompleto.append(boletimPeriodo)
+
+        removerArquivo(arquivoNome)
+
     # Salvando o boletim completo, com todos os periodos.
     salvarArquivo("dados.json", boletimCompleto)
 
