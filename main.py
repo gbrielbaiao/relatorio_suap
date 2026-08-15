@@ -1,7 +1,7 @@
 from os import getenv
 
-from functions.dados import coletarDadosBoletim
-from functions.arquivo import salvarArquivo 
+from functions.dados import coletarDadosBoletim, tratarDados
+from functions.arquivo import salvarArquivo, salvarArquivoCSV
 from functions.pagina import fazer_login, acessarPaginaBoletim
 
 def main():
@@ -25,7 +25,11 @@ def main():
         boletimCompleto.append(boletimPeriodo)
 
     # Salvando o boletim completo, com todos os periodos.
-    salvarArquivo("dados.json", boletimCompleto)
+    salvarArquivo("./dados/bruto/dados.json", boletimCompleto)
+
+    # Fazer o tratamento dos dados para serem analisados
+    dadosTratados = tratarDados()
+    salvarArquivoCSV("dados/tratado/dados.csv", dadosTratados)
 
 if __name__ == "__main__":
     main()

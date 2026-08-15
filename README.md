@@ -2,7 +2,8 @@
 Um sistema que gera um relatório de notas do SUAP IFMT.
 
 ## Dependencias
- - dotenv   -> `pip install python-dotenv`;
- - requests -> `pip install requests`
- - selectolax -> `pip install selectolax==0.4.10`
+ - dotenv     -> `pip install python-dotenv`;
+ - requests   -> `pip install requests`;
+ - selectolax -> `pip install selectolax==0.4.10`;
+ - pandas     -> `pip install pandas==3.0.3`;
  * No futuro será usado a biblioteca Flet, para fazer a interface gráfica.

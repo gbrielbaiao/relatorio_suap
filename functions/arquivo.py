@@ -1,3 +1,4 @@
+import csv
 import json
 
 def salvarArquivo(arquivo_nome: str, conteudo: dict | list | str) -> bool:
@@ -22,3 +23,9 @@ def lerArquivo(arquivo_nome: str) -> str | None:
     except OSError as erro:
         print(f"Ocorreu um erro ao tentar ler o arquivo ({arquivo_nome}):\n{erro}")
         return
+
+def salvarArquivoCSV(arquivo_nome: str, conteudo: list):
+    with open(arquivo_nome, 'w', newline='', encoding='utf-8') as f:
+        escritor = csv.writer(f)
+        escritor.writerow(conteudo[0])
+        escritor.writerows(conteudo[1])
