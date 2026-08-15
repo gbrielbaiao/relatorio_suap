@@ -1,10 +1,10 @@
 import json
 
-def salvarArquivo(arquivo_nome: str, conteudo: dict | str) -> bool:
+def salvarArquivo(arquivo_nome: str, conteudo: dict | list | str) -> bool:
     try:
         with open(arquivo_nome, 'w', encoding="utf-8") as arquivo:
             if type(conteudo) in (dict, list):
-                json.dump(conteudo, arquivo, indent=4, ensure_ascii=False) 
+                json.dump(conteudo, arquivo, indent=1, ensure_ascii=False) 
             else:
                 arquivo.write(conteudo)
 
